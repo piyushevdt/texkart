@@ -1,6 +1,6 @@
 import CustomFabricCard from "@/custom/CustomFabricCard";
 import { Box,  Grid, Typography } from "@mui/material";
-import fabricProducts from "@/components/Home/Components/HomeData/DealOfDayData";
+// import fabricProducts from "@/components/Home/Components/HomeData/DealOfDayData";
 import React from "react";
 import { motion } from "framer-motion"; 
 
@@ -15,6 +15,81 @@ interface FabricProduct {
   imageUrl: string;
   unit: string;
 }
+
+const fabricProducts = [
+    {
+      id: 1,
+      title: "Swiss 2x2 Sheer Cotton Voile",
+      rating: 3.5,
+      price: 1000,
+      originalPrice: 1200,
+      discount: "25% off",
+      tags: [
+        { id: "1", label: "Cotton" },
+        { id: "2", label: "Twisted" },
+        { id: "3", label: "Pure" },
+        { id: "4", label: "Polyster" },
+        { id: "5", label: "Polyster" },
+        { id: "6", label: "Polyster" },
+      ],
+      imageUrl: "/images/deal1.png",
+      unit: "yarn",
+    },
+    {
+      id: 2,
+      title: "Swiss 2x2 Sheer Cotton Voile",
+      rating: 4.2,
+      price: 1500,
+      originalPrice: 1800,
+      discount: "15% off",
+      tags: [
+        { id: "1", label: "Cotton" },
+        { id: "2", label: "Twisted" },
+        { id: "3", label: "Pure" },
+        { id: "4", label: "Polyster" },
+        { id: "5", label: "Polyster" },
+        { id: "6", label: "Polyster" },
+      ],
+      imageUrl: "/images/deal2.png",
+      unit: "yarn",
+    },
+    {
+      id: 3,
+      title: "Swiss 2x2 Sheer Cotton Voile",
+      rating: 4.1,
+      price: 1300,
+      originalPrice: 1600,
+      discount: "20% off",
+      tags: [
+        { id: "1", label: "Cotton" },
+        { id: "2", label: "Twisted" },
+        { id: "3", label: "Pure" },
+        { id: "4", label: "Polyster" },
+        { id: "5", label: "Polyster" },
+        { id: "6", label: "Polyster" },
+      ],
+      imageUrl: "/images/deal3.png",
+      unit: "yarn",
+    },
+    {
+      id: 4,
+      title: "Swiss 2x2 Sheer Cotton Voile",
+      rating: 4.2,
+      price: 1300,
+      originalPrice: 1600,
+      discount: "20% off",
+      tags: [
+        { id: "1", label: "Cotton" },
+        { id: "2", label: "Twisted" },
+        { id: "3", label: "Pure" },
+        { id: "4", label: "Polyster" },
+        { id: "5", label: "Polyster" },
+        { id: "6", label: "Polyster" },
+      ],
+      imageUrl: "/images/deal4.png",
+      unit: "yarn",
+    },
+  ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
