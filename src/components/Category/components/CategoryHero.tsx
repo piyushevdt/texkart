@@ -351,13 +351,15 @@ const CategoryHero: React.FC = () => {
                           variant="h5" 
                           component="div" 
                           className="mb-1"
+                          sx={{color: (theme) => theme.palette.primary.light, textShadow: '1px 1px 4px rgba(255, 130, 4, 0.7)'}}
                         >
                           {item.title}
                         </Typography>
                         {item.description && (
                           <Typography 
                             variant="body2" 
-                            className="text-gray-200"
+                            className="text-200"
+                            sx={{color: (theme) => theme.palette.primary.main,}}
                           >
                             {item.description}
                           </Typography>

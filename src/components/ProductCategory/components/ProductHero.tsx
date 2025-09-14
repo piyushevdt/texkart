@@ -27,16 +27,16 @@ export default function ProductHero() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
     >
-    <Box
-      sx={{
-        background: (theme) => theme.palette.backgroundGradient,
-        display: "flex",
-        justifyContent: "space-between",
-        pt: 1,
-        flexDirection: { xs: "column", sm: "row" },
-        borderRadius: "12px",
-      }}
-    >
+      <Box
+        sx={{
+          background: (theme) => theme.palette.backgroundGradient,
+          display: "flex",
+          justifyContent: "space-between",
+          pt: 1,
+          flexDirection: { xs: "column", sm: "row" },
+          borderRadius: "12px",
+        }}
+      >
         <Box sx={{ p: { xs: 3, sm: 4 } }}>
           <motion.div variants={itemVariants}>
             <Typography
@@ -91,7 +91,7 @@ export default function ProductHero() {
             sx={{ mt: { xs: 0, sm: 1 }, mb: { xs: -4, sm: -8, md: -5, lg: -7 } }}
           >
             <Image
-              src="/images/ProductCategoryHero.svg"
+              src="/images/ProductCategoryHero.png"
               alt="Image"
               width={300}
               height={100}
@@ -101,7 +101,7 @@ export default function ProductHero() {
             />
           </Box>
         </motion.div>
-    </Box>
-      </motion.div>
+      </Box>
+    </motion.div>
   );
 }
