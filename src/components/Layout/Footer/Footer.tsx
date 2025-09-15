@@ -68,9 +68,9 @@ const Footer: React.FC = () => {
                     Contact us
                   </Typography>
                 </Link>
-                <Typography variant="body2" className="font-medium">
+                {/* <Typography variant="body2" className="font-medium">
                   Become Seller
-                </Typography>
+                </Typography> */}
                 <Typography variant="body2" className="font-medium">
                   Blog
                 </Typography>

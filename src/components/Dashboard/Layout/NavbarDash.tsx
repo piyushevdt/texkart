@@ -3,26 +3,26 @@ import React, { useMemo, useState } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
+  // Typography,
   Box,
-  IconButton,
-  Drawer,
-  List,
-  ListItem,
-  useMediaQuery,
-  useTheme,
+  // IconButton,
+  // Drawer,
+  // List,
+  // ListItem,
+  // useMediaQuery,
+  // useTheme,
   Container,
 } from "@mui/material";
-import { Icon } from "@iconify/react";
+// import { Icon } from "@iconify/react";
 import CustomButton from "@/custom/CustomButton";
 import { useRouter } from "next/navigation";
 import RHFTextField from "@/custom/RHFTextField";
 import { useForm, FormProvider } from "react-hook-form";
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useDispatch } from 'react-redux'
-import { postLoginAsync } from "@/components/redux/services/auth";
-import type { AppDispatch } from '../../redux/store'
+// import { useDispatch } from 'react-redux'
+// import { postLoginAsync } from "@/components/redux/services/auth";
+// import type { AppDispatch } from '../../redux/store'
 // import toast from "react-hot-toast";
 
 
@@ -35,14 +35,14 @@ const loginSchema = Yup.object().shape({
     .min(6, 'Password must be at least 6 characters'),
 });
 
-const Navbar: React.FC = () => {
+const NavbarDash: React.FC = () => {
   const router = useRouter();
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-  const dispatch: AppDispatch = useDispatch()
+  // const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  // const dispatch: AppDispatch = useDispatch()
   const [loading, setLoading] = useState(false)
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // const theme = useTheme();
+  // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const defaultValues = useMemo(
     () => ({
@@ -62,40 +62,48 @@ const Navbar: React.FC = () => {
     handleSubmit,
   } = methods
 
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  // const onSubmit = (data: LoginFormValues) => {
-  //   console.log("Login attempted with:", data);
-  //   router.push("/seller-dashboard");
+  // const handleDrawerToggle = () => {
+  //   setDrawerOpen(!drawerOpen);
   // };
 
-  const onSubmit = (values: { email: string; password: string }) => {
-    setLoading(true)
+  const onSubmit = (data: { email: string; password: string }) => {
+    console.log("Login attempted with:", data);
+    // Mock login - redirect to seller dashboard
+    setLoading(true);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      setLoading(false);
+      router.push("/seller-dashboard");
+    }, 1000);
+  };
 
-    const payload = {
-      email: values.email,
-      password: values.password
-    }
+  // Commented out the original API call
+  // const onSubmit = (values: { email: string; password: string }) => {
+  //   setLoading(true)
 
-    dispatch(postLoginAsync(payload))
-    .then((action) => {
-      if (postLoginAsync.fulfilled.match(action)) {
-        const userData = action.payload;
-        
-        localStorage.setItem('userData', JSON.stringify(userData));
-        
-        router.push("/seller-dashboard");
-      } else {
-        setLoading(false);
-      }
-    })
-  }
+  //   const payload = {
+  //     email: values.email,
+  //     password: values.password
+  //   }
+
+  //   dispatch(postLoginAsync(payload))
+  //   .then((action) => {
+  //     if (postLoginAsync.fulfilled.match(action)) {
+  //       const userData = action.payload;
+      
+  //       localStorage.setItem('userData', JSON.stringify(userData));
+      
+  //       router.push("/seller-dashboard");
+  //     } else {
+  //       setLoading(false);
+  //     }
+  //   })
+  // }
 
   const loginForm = (
     <FormProvider {...methods}>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} className="flex items-center">
+      <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{display: "flex", flexDirection: {xs: "column", sm: "row"}, alignItems: "center", gap: 1}}>
         <RHFTextField 
           name="email" 
           placeholder="Enter your Email"
@@ -136,7 +144,7 @@ const Navbar: React.FC = () => {
         <CustomButton 
           gradient 
           type="submit" 
-          sx={{ px: 6, height: "53px", fontSize: "24px" }}
+          sx={{ px: 6, height: "40px", fontSize: "24px" , mb: { xs: 1, sm: 0}}}
           loading={loading}
         >
           login
@@ -145,36 +153,36 @@ const Navbar: React.FC = () => {
     </FormProvider>
   );
 
-  const drawer = (
-    <Box className="p-4 bg-white h-full">
-      <FormProvider {...methods}>
-        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-          <List>
-            <ListItem>
-              <RHFTextField
-                name="email"
-                label="Email"
-                size="small"
-              />
-            </ListItem>
-            <ListItem>
-              <RHFTextField
-                name="password"
-                label="Password"
-                type="password"
-                size="small"
-              />
-            </ListItem>
-            <ListItem>
-              <CustomButton gradient type="submit" fullWidth loading={loading}>
-                login
-              </CustomButton>
-            </ListItem>
-          </List>
-        </Box>
-      </FormProvider>
-    </Box>
-  );
+  // const drawer = (
+  //   <Box className="p-4 bg-white h-full">
+  //     <FormProvider {...methods}>
+  //       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+  //         <List>
+  //           <ListItem>
+  //             <RHFTextField
+  //               name="email"
+  //               label="Email"
+  //               size="small"
+  //             />
+  //           </ListItem>
+  //           <ListItem>
+  //             <RHFTextField
+  //               name="password"
+  //               label="Password"
+  //               type="password"
+  //               size="small"
+  //             />
+  //           </ListItem>
+  //           <ListItem>
+  //             <CustomButton gradient type="submit" fullWidth loading={loading}>
+  //               login
+  //             </CustomButton>
+  //           </ListItem>
+  //         </List>
+  //       </Box>
+  //     </FormProvider>
+  //   </Box>
+  // );
   
 
   return (
@@ -189,22 +197,23 @@ const Navbar: React.FC = () => {
         }}
       >
         <Toolbar
-          className="justify-between"
           sx={{
             boxShadow: "none",
             padding: 0,
             margin: 0,
+            display: "flex",
+            justifyContent: "flex-end",
           }}
         >
-          <Typography
+          {/* <Typography
             variant="h3"
             className="text-white font-bold cursor-pointer"
             onClick={() => router.push("/")}
           >
             TexKart
-          </Typography>
+          </Typography> */}
 
-          {isMobile ? (
+          {/* {isMobile ? (
             <>
               <IconButton
                 color="inherit"
@@ -222,13 +231,13 @@ const Navbar: React.FC = () => {
                 {drawer}
               </Drawer>
             </>
-          ) : (
+          ) : ( */}
             <Box className="flex items-center">{loginForm}</Box>
-          )}
+          {/* )} */}
         </Toolbar>
       </AppBar>
     </Container>
   );
 };
 
-export default Navbar;
+export default NavbarDash;

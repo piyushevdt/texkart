@@ -17,16 +17,19 @@ import {
   ListItemText,
   Divider,
   Typography,
+  Collapse,
 } from "@mui/material";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import CustomButton from "@/custom/CustomButton";
 import { useRouter, usePathname } from "next/navigation";
+import NavbarDash from "@/components/Dashboard/Layout/NavbarDash";
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sellerDropdownOpen, setSellerDropdownOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -38,16 +41,19 @@ const Navbar: React.FC = () => {
     router.push(path);
     handleDrawerToggle();
   };
-  
+
+  const toggleSellerDropdown = () => {
+    setSellerDropdownOpen(!sellerDropdownOpen);
+  };
 
   return (
     <Box>
       <Box
         className="bg-[#0F2E61] text-white py-2"
-        sx={{ display: { xs: "none", sm: "block" } }}
+        // sx={{ display: { xs: "none", sm: "block" } }}
       >
-        <Container className="flex justify-between items-center gap-2">
-          <Box className="flex items-center space-x-6">
+        <Container sx={{display: "flex", justifyContent: "space-between", px: { xs: 1, sm: 3}, flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "flex-start", sm: "center" }, gap: { xs: 1, sm: 0} }}>
+          <Box sx={{display:"flex", flexDirection: { xs: "row", sm: "row" }, gap: { xs: 1, sm: 2 }, pt:1}}>
             <Box className="flex items-center">
               <Icon icon="mdi:phone" className="mr-1" />
               <Link href="tel:+919699360370" className="text-sm">
@@ -57,7 +63,7 @@ const Navbar: React.FC = () => {
             <Divider
               orientation="vertical"
               flexItem
-              sx={{ borderColor: "white", height: "20px", mx: 1 }}
+              sx={{ borderColor: "white", height: "16px", mx: {xs: 0, sm: 1}, mt: {xs: 0.5, sm: 1} }}
             />
             <Box className="flex items-center">
               <Icon icon="mdi:email" style={{ marginRight: "10px" }} />
@@ -66,18 +72,49 @@ const Navbar: React.FC = () => {
               </Link>
             </Box>
           </Box>
-          <Box>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, width: { xs: "100%", sm: "auto" }  }}>
             <Button
               variant="text"
               color="inherit"
               startIcon={<Icon icon="mdi:account" />}
               className="text-white"
               size="small"
+              onClick={toggleSellerDropdown}
+              endIcon={
+                <Icon
+                  icon={
+                    sellerDropdownOpen
+                      ? "mdi:chevron-up"
+                      : "mdi:chevron-down"
+                  }
+                />
+              }
+              sx={{fontSize: { xs: "10px", sm: "14px" }, whiteSpace: "nowrap"}}
             >
               Become a Seller
             </Button>
+            
+            {/* Seller Dropdown */}
           </Box>
         </Container>
+           <Container>
+             <Collapse 
+              in={sellerDropdownOpen} 
+              sx={{ 
+                // position: "absolute", 
+                top: "100%", 
+                right: 0, 
+                zIndex: 999,
+                // width: "300px",
+                // backgroundColor: "white",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                borderRadius: "4px",
+                mt: 1
+              }}
+            >
+              <NavbarDash />
+            </Collapse>
+           </Container>
       </Box>
 
       <Container>
@@ -277,10 +314,22 @@ const Navbar: React.FC = () => {
             </ListItem>
             )}
             <ListItem disablePadding>
-              <ListItemButton onClick={handleDrawerToggle}>
+              <ListItemButton onClick={toggleSellerDropdown}>
                 <Icon icon="mdi:account" style={{ marginRight: "10px" }} />
                 <ListItemText primary="Become a Seller" />
+                <Icon
+                  icon={
+                    sellerDropdownOpen
+                      ? "mdi:chevron-up"
+                      : "mdi:chevron-down"
+                  }
+                />
               </ListItemButton>
+              <Collapse in={sellerDropdownOpen} timeout="auto" unmountOnExit>
+                <Box sx={{ pl: 2 }}>
+                  <NavbarDash />
+                </Box>
+              </Collapse>
             </ListItem>
           </List>
 
