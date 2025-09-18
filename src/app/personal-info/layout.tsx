@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Avatar,
   Box,
@@ -12,8 +13,9 @@ import {
   Drawer,
   IconButton,
   Container,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
-// import MenuIcon from "@mui/icons-material/Menu";
 import BusinessInfo from "@/components/PersonalInfo/BusinessInfo";
 import Order from "@/components/PersonalInfo/Order";
 import Complaints from "@/components/PersonalInfo/Complaints";
@@ -23,6 +25,12 @@ import TermsPolicies from "@/components/PersonalInfo/TermsPolicies";
 import ReviewsRatings from "@/components/PersonalInfo/ReviewsRatings";
 import Logout from "@/components/PersonalInfo/Logout";
 import { Icon } from "@iconify/react/dist/iconify.js";
+
+interface UserData {
+  token: string;
+  email: string;
+  name?: string;
+}
 
 const menuItems = [
   {
@@ -51,11 +59,40 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const [activeComponent, setActiveComponent] = useState(menuItems[0].text);
   const [selectedItem, setSelectedItem] = useState("Business information");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const storedUserData = localStorage.getItem('userData');
+      if (!storedUserData) {
+        router.push("/");
+        return;
+      }
+
+      try {
+        const parsedData: UserData = JSON.parse(storedUserData);
+        if (!parsedData.token) {
+          router.push("/");
+          return;
+        }
+        
+        setUserData(parsedData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        router.push("/");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleNavClick = (text?: string) => {
     setActiveComponent(text || "");
     setSelectedItem(text || "");
-    setDrawerOpen(false); // Close drawer after selecting
+    setDrawerOpen(false); 
   };
 
   const toggleDrawer = (open: boolean) => {
@@ -65,6 +102,39 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const ActiveComponent =
     menuItems.find((item) => item.text === activeComponent)?.component ||
     (() => <>{children}</>);
+
+  if (loading) {
+    return (
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundColor: 'rgba(241, 109, 53, 0.92)'
+        }}
+        open={loading}
+      >
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={2}
+        >
+          <CircularProgress
+            color="inherit"
+            size={60}
+            thickness={4}
+          />
+          <Typography variant="h6" color="inherit">
+            Loading...
+          </Typography>
+        </Box>
+      </Backdrop>
+    );
+  }
+
+  if (!userData) {
+    return null;
+  }
 
   return (
     <Container>
@@ -101,9 +171,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <Box display="flex" alignItems="center" gap={1} p={2}>
               <Avatar src="/images/profile.png" sx={{ width: 64, height: 64 }} />
               <Box display="flex" flexDirection="column" gap={1}>
-                <Typography fontWeight="bold">XYZZZ</Typography>
+                <Typography fontWeight="bold">
+                  {userData.name || "User"}
+                </Typography>
                 <Typography variant="body2" color="gray">
-                  Xyzzzzzzzzzzz@gmail.com
+                  {userData.email}
                 </Typography>
                 <Typography
                   color="primary"
@@ -195,7 +267,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </Drawer>
 
         {/* Right Side Content */}
-        {/* <div style={{ flex: 1, padding: "10px", marginTop: 20 }}> */}
         <Container
           maxWidth="md"
           sx={{
@@ -207,7 +278,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         >
           <ActiveComponent />
         </Container>
-        {/* </div> */}
       </div>
     </Container>
   );
