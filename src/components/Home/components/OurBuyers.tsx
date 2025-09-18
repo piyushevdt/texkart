@@ -50,7 +50,7 @@ const OurBuyers: React.FC = () => {
   };
 
   return (
-    <Box mt={6}>
+    <Box my={6}>
       <motion.div
         initial="hidden"
         whileInView="visible"

@@ -179,6 +179,9 @@ const LogInForm: React.FC<LoginFormProps> = ({
           </CustomButton>
         </Box>
       </Stack>
+      <Typography variant="body2" sx={{ my: 1, color: "#5B5B5B", fontStyle: "italic" }}>
+        Demo credentials: user@texkart.com / texkart123
+      </Typography>
     </Box>
   );
 };

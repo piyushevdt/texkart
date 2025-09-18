@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -17,21 +17,43 @@ import {
   ListItemText,
   Divider,
   Typography,
-  Collapse,
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from "@mui/material";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import CustomButton from "@/custom/CustomButton";
 import { useRouter, usePathname } from "next/navigation";
-import NavbarDash from "@/components/Dashboard/Layout/NavbarDash";
+
+interface UserData {
+  token: string;
+  email: string;
+  name?: string;
+}
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sellerDropdownOpen, setSellerDropdownOpen] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Check if current path is allowed for the token
+  const isAllowedRoute = pathname === "/" || pathname === "/personal-info";
+
+  useEffect(() => {
+    // Check if token exists in localStorage on component mount
+    const storedUserData = localStorage.getItem('userData');
+    if (storedUserData && isAllowedRoute) {
+      setUserData(JSON.parse(storedUserData));
+    } else {
+      setUserData(null);
+    }
+  }, [isAllowedRoute, pathname]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -42,18 +64,39 @@ const Navbar: React.FC = () => {
     handleDrawerToggle();
   };
 
-  const toggleSellerDropdown = () => {
-    setSellerDropdownOpen(!sellerDropdownOpen);
+  const handleSeller = () => {
+    router.push("/seller");
+  };
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDashboard = () => {
+    handleMenuClose();
+    router.push("/personal-info");
+  };
+
+  const handleLogout = () => {
+    // Remove token from localStorage
+    localStorage.removeItem('userData');
+    setUserData(null);
+    handleMenuClose();
+    // Redirect to home
+    router.push("/");
   };
 
   return (
     <Box>
       <Box
         className="bg-[#0F2E61] text-white py-2"
-        // sx={{ display: { xs: "none", sm: "block" } }}
       >
-        <Container sx={{display: "flex", justifyContent: "space-between", px: { xs: 1, sm: 3}, flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "flex-start", sm: "center" }, gap: { xs: 1, sm: 0} }}>
-          <Box sx={{display:"flex", flexDirection: { xs: "row", sm: "row" }, gap: { xs: 1, sm: 2 }, pt:1}}>
+        <Container sx={{display: {xs: "none", md: "flex"}, justifyContent: "space-between", px: { xs: 1, sm: 3}, flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "flex-start", sm: "center" }, gap: { xs: 1, sm: 0} }}>
+          <Box sx={{display:"flex", flexDirection: { xs: "row", sm: "row" }, gap: { xs: 1, sm: 2 }, py:1,}}>
             <Box className="flex items-center">
               <Icon icon="mdi:phone" className="mr-1" />
               <Link href="tel:+919699360370" className="text-sm">
@@ -63,7 +106,7 @@ const Navbar: React.FC = () => {
             <Divider
               orientation="vertical"
               flexItem
-              sx={{ borderColor: "white", height: "16px", mx: {xs: 0, sm: 1}, mt: {xs: 0.5, sm: 1} }}
+              sx={{ borderColor: "white", height: "16px", mx: {xs: 0, sm: 1}, mt: {xs: 0.5, sm: 0.5} }}
             />
             <Box className="flex items-center">
               <Icon icon="mdi:email" style={{ marginRight: "10px" }} />
@@ -79,42 +122,13 @@ const Navbar: React.FC = () => {
               startIcon={<Icon icon="mdi:account" />}
               className="text-white"
               size="small"
-              onClick={toggleSellerDropdown}
-              endIcon={
-                <Icon
-                  icon={
-                    sellerDropdownOpen
-                      ? "mdi:chevron-up"
-                      : "mdi:chevron-down"
-                  }
-                />
-              }
+              onClick={handleSeller}
               sx={{fontSize: { xs: "10px", sm: "14px" }, whiteSpace: "nowrap"}}
             >
               Become a Seller
             </Button>
-            
-            {/* Seller Dropdown */}
           </Box>
         </Container>
-           <Container>
-             <Collapse 
-              in={sellerDropdownOpen} 
-              sx={{ 
-                // position: "absolute", 
-                top: "100%", 
-                right: 0, 
-                zIndex: 999,
-                // width: "300px",
-                // backgroundColor: "white",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                borderRadius: "4px",
-                mt: 1
-              }}
-            >
-              <NavbarDash />
-            </Collapse>
-           </Container>
       </Box>
 
       <Container>
@@ -219,9 +233,54 @@ const Navbar: React.FC = () => {
                 {" "}
                 Track Order
               </CustomButton>
-              {pathname !== "/personal-info" && (
+              
+              {/* Show login button or user avatar with menu based on authentication status */}
+              {userData && isAllowedRoute ? (
+                <Box display="flex" alignItems="center" gap={1}>
+                  <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
+                    <Avatar 
+                      alt={userData.email} 
+                      src="/static/images/avatar/2.jpg"
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    PaperProps={{
+                      elevation: 3,
+                      sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        '& .MuiAvatar-root': {
+                          width: 32,
+                          height: 32,
+                          ml: -0.5,
+                          mr: 1,
+                        },
+                      },
+                    }}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                  >
+                    <MenuItem onClick={handleDashboard}>
+                      <ListItemIcon>
+                        <Icon icon="mdi:view-dashboard" width={24} height={24} style={{ color: "#636363" }} />
+                      </ListItemIcon>
+                      <Typography variant="body2">Dashboard</Typography>
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>
+                      <ListItemIcon>
+                        <Icon icon="mdi:logout" width={24} height={24} style={{ color: "#636363" }} />
+                      </ListItemIcon>
+                      <Typography variant="body2">Logout</Typography>
+                    </MenuItem>
+                  </Menu>
+                </Box>
+              ) : (
                 <CustomButton gradient onClick={() => router.push("/login")}>
-                  {" "}
                   Login/Signup
                 </CustomButton>
               )}
@@ -302,35 +361,40 @@ const Navbar: React.FC = () => {
                 <ListItemText primary="Track Order" />
               </ListItemButton>
             </ListItem>
-            {pathname !== "/personal-info" && (
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => handleNavigation("/login")}>
-                <Icon icon="mdi:login" style={{ marginRight: "10px" }} />
-                <ListItemText
-                  primary="Login/Signup"
-                  className="text-orange-500"
-                />
-              </ListItemButton>
-            </ListItem>
+            
+            {/* Mobile login/logout section */}
+            {userData && isAllowedRoute ? (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <Icon icon="mdi:account" style={{ marginRight: "10px" }} />
+                    <ListItemText primary={`Welcome, ${userData.email}`} />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={handleDashboard}>
+                    <Icon icon="mdi:view-dashboard" style={{ marginRight: "10px" }} />
+                    <ListItemText primary="Dashboard" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={handleLogout}>
+                    <Icon icon="mdi:logout" style={{ marginRight: "10px" }} />
+                    <ListItemText primary="Logout" />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            ) : (
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => handleNavigation("/login")}>
+                  <Icon icon="mdi:login" style={{ marginRight: "10px" }} />
+                  <ListItemText
+                    primary="Login/Signup"
+                    className="text-orange-500"
+                  />
+                </ListItemButton>
+              </ListItem>
             )}
-            <ListItem disablePadding>
-              <ListItemButton onClick={toggleSellerDropdown}>
-                <Icon icon="mdi:account" style={{ marginRight: "10px" }} />
-                <ListItemText primary="Become a Seller" />
-                <Icon
-                  icon={
-                    sellerDropdownOpen
-                      ? "mdi:chevron-up"
-                      : "mdi:chevron-down"
-                  }
-                />
-              </ListItemButton>
-              <Collapse in={sellerDropdownOpen} timeout="auto" unmountOnExit>
-                <Box sx={{ pl: 2 }}>
-                  <NavbarDash />
-                </Box>
-              </Collapse>
-            </ListItem>
           </List>
 
           <Box className="mt-4 border-t">
@@ -358,9 +422,22 @@ const Navbar: React.FC = () => {
                 href="mailto:support@texkart.com"
                 className="text-sm"
                 onClick={handleDrawerToggle}
-              >
+                >
                 support@texkart.com
               </Link>
+            </Box>
+            <Box mt={2}>
+               <Button
+              variant="text"
+              color="inherit"
+              startIcon={<Icon icon="mdi:account" />}
+              className="text-white"
+              size="small"
+              onClick={handleSeller}
+              sx={{fontSize: { xs: "10px", sm: "14px" }, whiteSpace: "nowrap"}}
+            >
+              Become a Seller
+            </Button>
             </Box>
           </Box>
         </Box>

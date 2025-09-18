@@ -366,7 +366,7 @@ const Footer: React.FC = () => {
                   Cart
                 </Typography>
               </Link>
-              <Typography>Seller</Typography>
+              {/* <Typography>Seller</Typography> */}
               <Link href="/contact-us" passHref>
                 <Typography
                   variant="body2"

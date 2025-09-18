@@ -1,6 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Box, Grid, Container, IconButton } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Container,
+  IconButton,
+} from "@mui/material";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
@@ -8,7 +13,10 @@ import EnterOtp from "./components/EnterOtp";
 import ResetPasswordForm from "./components/ResetPasswordForm";
 import OtpSent from "./components/OtpSent";
 import LogInForm from "./components/LogInForm";
-import { useRouter } from "next/navigation";
+import { 
+  useRouter, 
+  // usePathname 
+} from "next/navigation";
 import toast from "react-hot-toast";
 
 type AuthState =
@@ -17,6 +25,12 @@ type AuthState =
   | "forgotPassword"
   | "otpSent"
   | "enterOtp";
+
+// Static credentials
+const STATIC_CREDENTIALS = {
+  email: "user@texkart.com",
+  password: "texkart123"
+};
 
 const LoginIndex: React.FC = () => {
   const [authState, setAuthState] = useState<AuthState>("login");
@@ -27,6 +41,10 @@ const LoginIndex: React.FC = () => {
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState(false);
   const router = useRouter();
+  // const pathname = usePathname();
+
+  // Check if current path is allowed for the token
+  // const isAllowedRoute = pathname === "/" || pathname === "/personal-info";
 
   const handleStateChange = (state: AuthState) => {
     setAuthState(state);
@@ -58,6 +76,32 @@ const LoginIndex: React.FC = () => {
         setOtpError(true);
       }
     }
+  };
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      toast.error("Please Fill All Fields");
+      return;
+    }
+    
+    // Validate against static credentials
+    if (email !== STATIC_CREDENTIALS.email || password !== STATIC_CREDENTIALS.password) {
+      toast.error("Invalid email or password");
+      return;
+    }
+    
+    // Store static token in localStorage
+    const staticToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRleEt1cnQgVXNlciIsImlhdCI6MTUxNjIzOTAyMn0";
+    const userData = {
+      token: staticToken,
+      email: email,
+      // Add other user data as needed
+    };
+    
+    localStorage.setItem('userData', JSON.stringify(userData));
+    
+    // Redirect to personal info page
+    router.push("/personal-info");
   };
 
   return (
@@ -93,7 +137,6 @@ const LoginIndex: React.FC = () => {
           md={6}
           sx={{
             display: "flex",
-            // justifyContent: "center",
             alignItems: "center",
             bgcolor: "background.default",
             px: { xs: 1, md: 4 },
@@ -107,13 +150,7 @@ const LoginIndex: React.FC = () => {
               onEmailChange={setEmail}
               onPasswordChange={setPassword}
               onForgotPassword={() => handleStateChange("forgotPassword")}
-              onLogin={() => {
-                if (!email || !password) {
-                  toast.error("Please Fill All Fields");
-                  return;
-                }
-                router.push("/personal-info");
-              }}
+              onLogin={handleLogin}
             />
           )}
           {authState === "forgotPassword" && (

@@ -130,15 +130,19 @@ export default function Layout({ children }: LayoutProps) {
     useState<null | HTMLElement>(null);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
 
-  const [userName, setUserName] = useState("");
+  const [sellerName, setSellerName] = useState("");
 
   useEffect(() => {
-    const userData = localStorage.getItem("userData");
-    if (userData) {
-      const parsedUserData = JSON.parse(userData);
-      setUserName(parsedUserData.data?.name);
+    // Check for seller data instead of user data
+    const sellerData = localStorage.getItem("sellerData");
+    if (sellerData) {
+      const parsedSellerData = JSON.parse(sellerData);
+      setSellerName(parsedSellerData.name || "Seller");
+    } else {
+      // Redirect to seller login if no seller data found
+      router.push("/seller");
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const initialExpandedState: { [key: string]: boolean } = {};
@@ -170,7 +174,6 @@ export default function Layout({ children }: LayoutProps) {
   const profileOpen = Boolean(profileAnchor);
 
   useEffect(() => {
-    // This will only run on the client side
     const timer = setInterval(() => {
       setCurrentTime(
         new Date().toLocaleTimeString([], {
@@ -225,6 +228,12 @@ export default function Layout({ children }: LayoutProps) {
     return pathname === path;
   };
 
+  const handleSellerLogout = () => {
+    localStorage.removeItem("sellerData"); 
+    router.push("/seller"); 
+    toast.success("Logged out successfully");
+  };
+
   const drawer = (
     <Box
       sx={{
@@ -248,10 +257,10 @@ export default function Layout({ children }: LayoutProps) {
         <Typography
           variant="h4"
           component="div"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/seller")}
           sx={{ fontWeight: "bold", cursor: "pointer" }}
         >
-          TexKart
+          TexKart Seller
         </Typography>
       </Box>
       <List sx={{ flexGrow: 1, overflow: 'auto', scrollbarWidth: "none",
@@ -342,11 +351,7 @@ export default function Layout({ children }: LayoutProps) {
               color: "white",
             },
           }}
-          onClick={() => {
-            localStorage.removeItem("userData"); 
-            router.push("/"); 
-            toast.success("Log Out Successfully")
-          }}
+          onClick={handleSellerLogout}
         >
           <ListItemIcon sx={{ color: "#D9D9D9", minWidth: 40 }}>
             <Icon icon="mdi:logout" width={24} height={24} />
@@ -390,7 +395,7 @@ export default function Layout({ children }: LayoutProps) {
           >
             <Box sx={{ display: { xs: "none", sm: "block", md: "block" } }}>
               <Typography variant="h6" noWrap component="div">
-                Hello {userName}
+                Hello {sellerName}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {currentTime}
@@ -455,11 +460,11 @@ export default function Layout({ children }: LayoutProps) {
                   variant="body1"
                   sx={{ mr: 1, display: { xs: "none", md: "block" } }}
                 >
-                  {userName}
+                  {sellerName}
                 </Typography>
                 <Avatar
-                  alt={userName}
-                  src="/images/user.png"
+                  alt={sellerName}
+                  src="/images/seller.png"
                   onClick={handleProfileClick}
                   sx={{ cursor: "pointer" }}
                 />
@@ -472,7 +477,7 @@ export default function Layout({ children }: LayoutProps) {
                   transformOrigin={{ vertical: "top", horizontal: "center" }}
                 >
                   <MenuList sx={{ minWidth: 150, bgcolor: "#FFF" }}>
-                    <MenuItem onClick={() => router.push("/")}>
+                    <MenuItem onClick={() => router.push("/seller-dashboard")}>
                       Dashboard
                     </MenuItem>
                     <MenuItem onClick={handleCloseProfile}>Profile</MenuItem>
